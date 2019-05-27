@@ -1,0 +1,20 @@
+{
+	"reddit": {
+		"light_copy_self_posts": true,
+		"light_copy_all_posts": true,
+		"full_copy_self_posts": false,
+		"full_copy_all_posts": false,
+		"download_reddit_video": true,
+		"download_reddit_image": true,
+		"download_thumbnails": true
+	},
+	
+	"imgur": {
+		"download": true,
+		"download_albums": false
+	},
+	
+	"youtube": {
+		"download_videos": false
+	}
+}
