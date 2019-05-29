@@ -21,10 +21,14 @@ def write_item_to_stream(item, stream):
 	if kind == 't3': # regular post
 		stream.write(f"{padded_to(str(data['score']), 7)} | {data['title']} | {data['domain']}\n")
 		stream.write(f"to /r/{data['subreddit']} by {data['author']} on {time.ctime(data['created'])} with {data['num_comments']} comments.\n")
-		stream.write("\n")
+		stream.write(f"\n")
 		
 	elif kind == 't1': # comment
-		pass
+		stream.write(f"{padded_to(str(data['score']), 7)} | {data['link_title']} | in /r/{data['subreddit']}\n")
+		stream.write(f"{data['author']}'s comment from {time.ctime(data['created'])}.\n")
+		stream.write(f"{data['body']}\n")
+		stream.write(f"\n")
+				
 
 if __name__ == "__main__":
 	print(f'rsaved/{__version__} review_user.py')
