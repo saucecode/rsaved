@@ -122,7 +122,7 @@ def add_to_index(username, data):
 	# only bother to load and write to the index if there is new data
 	if len(new_data) > 0:
 		existing_data = rsaved.load_index(username)
-		data = new_data + data
+		data = new_data + existing_data
 		rsaved.dump_index(username, data)
 	
 	return len(new_data)
