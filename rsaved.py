@@ -84,4 +84,4 @@ def padded_to(string, length, pad=' '):
 
 # ty https://stackoverflow.com/questions/870652/pythonic-way-to-split-comma-separated-numbers-into-pairs
 def n_wise(seq, n):
-	return zip(*([iter(seq)]*n))s
+	return zip(*([iter(seq)]*n))
