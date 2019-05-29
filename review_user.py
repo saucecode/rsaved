@@ -4,16 +4,9 @@
 import rsaved
 import sys, json, os, time, subprocess
 
+from rsaved import padded_to, n_wise
+
 __version__ = rsaved.__version__
-
-def padded_to(string, length, pad=' '):
-	'''Appends a padding character to a string until it reaches a desired length.'''
-	if len(string) >= length: return string
-	return string + pad*(length - len(string))
-
-# ty https://stackoverflow.com/questions/870652/pythonic-way-to-split-comma-separated-numbers-into-pairs
-def n_wise(seq, n):
-	return zip(*([iter(seq)]*n))
 
 def write_item_to_stream(item, stream):
 	'''Writes a reddit object (post or comment) to the stream in a human-readable format.

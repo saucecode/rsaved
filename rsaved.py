@@ -74,3 +74,14 @@ def index_exists(username):
 def iso8601():
 	'Returns current local date and time as an ISO8601 string.'
 	return datetime.datetime.now().replace(microsecond=0).isoformat()
+
+### some util functions
+
+def padded_to(string, length, pad=' '):
+	'''Appends a padding character to a string until it reaches a desired length.'''
+	if len(string) >= length: return string
+	return string + pad*(length - len(string))
+
+# ty https://stackoverflow.com/questions/870652/pythonic-way-to-split-comma-separated-numbers-into-pairs
+def n_wise(seq, n):
+	return zip(*([iter(seq)]*n))s
