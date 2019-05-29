@@ -34,7 +34,7 @@ class CacheResponse(object):
 		return self.json_content
 	
 
-def generate_saved_feed(username, *, max_pages=42069, until_name=None, cached=None):
+def generate_saved_feed(username, *, max_pages=42069, until_names=None, cached=None):
 	'''Downloads and yields entire page views of a saved feed.
 	
 	The default behavior is to download the entirety of the feed.
@@ -49,7 +49,7 @@ def generate_saved_feed(username, *, max_pages=42069, until_name=None, cached=No
 	Args:
 		username: The username to download for.
 		max_pages: The maximum number of pages to download. Optional, defaults to a big number.
-		until_name: Will stop downloading new pages when this name is reached. Optional.
+		until_names: Will stop downloading new pages when any of these names are reached. Optional.
 		cached: Load from a cache folder instead of downloading. Optional.
 	
 	Returns:
@@ -89,11 +89,14 @@ def generate_saved_feed(username, *, max_pages=42069, until_name=None, cached=No
 			print('Stopping: Reached the end of the feed (dist=0)')
 			break
 		
-		# stop when this name is reached
-		if until_name:
-			names = [piece['data']['name'] for piece in data['data']['children']]
-			if until_name in names:
-				print('Stopping: Reached a page with until_name', until_name)
+		# stop when any of these names are reached
+		if until_names:
+			names = set([piece['data']['name'] for piece in data['data']['children']])
+			until_names = set(until_names)
+			intersection = until_names.intersection(names)
+			
+			if len(intersection) > 0:
+				print(f'Stopping: Reached a page with until_names ({len(intersection)})')
 				break
 		
 		page += 1
@@ -136,11 +139,11 @@ if __name__ == "__main__":
 
 	username = sys.argv[1]
 	
-	last_name = None
+	last_names = None
 	if rsaved.index_exists(username):
-		last_name = rsaved.load_index_names(username)[0]
+		last_names = rsaved.load_index_names(username)[:20]
 	
-	results = [r for r in generate_saved_feed(username, until_name=last_name)]
+	results = [r for r in generate_saved_feed(username, until_names=last_names)]
 	data = []
 	for result in results: data += result['data']['children']
 	
