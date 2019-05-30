@@ -72,14 +72,18 @@ def regenerate_jobs(username):
 				continue
 		
 		if post['data'].get('domain') in domains_available:
+			jobs = [downloader.create_job(post, f'user/{username}/library/{post["data"]["name"]}', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
+			all_jobs.extend( [j for j in jobs if j is not None] ) # create_job can return None - filter them out here
+			
+			# despite having downloaders with domains available, they produced no jobs.
+			# therefore we do not bother creating a folder/manifest.
+			if not any(jobs):
+				continue
+				
 			try:
 				os.mkdir(f'user/{username}/library/{post["data"]["name"]}')
 			except FileExistsError:
 				pass
-			
-			jobs = [downloader.create_job(post, f'user/{username}/library/{post["data"]["name"]}', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
-			all_jobs.extend( jobs )
-			
 			with open(f'user/{username}/library/{post["data"]["name"]}/manifest.json', 'w') as f:
 				json.dump({
 					'generated': int(time.time()),

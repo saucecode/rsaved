@@ -12,6 +12,12 @@ def create_job(item, target_folder, config, rs):
 	if domain not in domains():
 		raise NotImplementedError('Downloader default.py received an item with an unsupported domain.')
 	
+	if 'youtu' in domain and rs.get('youtube', {}).get('download_videos', False) == False:
+		return None
+	
+	if 'v.redd.it' in domain and rs.get('reddit', {}).get('download_reddit_video', True) == False:
+		return None
+	
 	command = [
 		'youtube-dl',
 		'--write-thumbnail',
