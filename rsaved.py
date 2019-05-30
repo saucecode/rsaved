@@ -1,4 +1,4 @@
-import requests, json, datetime, gzip, pickle, os, time, subprocess
+import requests, json, datetime, gzip, pickle, os, time, subprocess, tarfile, shutil
 
 __version__ = '1.0'
 
@@ -155,6 +155,40 @@ def execute_job(username, name, force=False):
 	
 	return returncodes
 
+def library_clean_completed(username):
+	'''Cleans out manifest and *_commands.log files of completed downloads from the library folder.
+	
+	The files are compressed into a tar.bz2 file in the cache/history folder.
+	They can safely be deleted.
+	
+	Returns:
+		Number of JSON files cleaned out of the library.
+	'''
+	history_folder = f'user/{username}/cache/history'
+	library_folder = f'user/{username}/library'
+	timestamp = iso8601()
+	
+	os.mkdir(f'{history_folder}/{timestamp}')
+	
+	cleaned = 0
+	
+	json_files = [f for f in os.listdir(library_folder) if f.endswith('.json')]
+	for fname in json_files:
+		name = fname.split('.')[0]
+		
+		manifest = load_library_entry_manifest(username, name)
+		if manifest['completed'] == True:
+			os.rename(f"{library_folder}/{fname}", f"{history_folder}/{timestamp}/{fname}")
+			os.rename(f"{library_folder}/{name}_commands.log", f"{history_folder}/{timestamp}/{name}_commands.log")
+			cleaned += 1
+
+	with tarfile.open(f'{history_folder}/{timestamp}.bz2', 'w:bz2') as t:
+		for fname in os.listdir(f'{history_folder}/{timestamp}'):
+			t.add(f'{history_folder}/{timestamp}/{fname}', arcname=fname)
+
+	shutil.rmtree(f'{history_folder}/{timestamp}')
+
+	return cleaned
 
 
 ### Lots and lots of loading/dumping/exists functions
