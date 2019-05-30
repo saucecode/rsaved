@@ -49,7 +49,7 @@ def regenerate_jobs(username):
 	Currently, the jobs in this list are such that they can be called with:
 	
 		for job in list:
-			subprocess.call(item)
+			subprocess.call(job)
 	
 	This will almost definitely change.
 	
@@ -73,7 +73,8 @@ def regenerate_jobs(username):
 	for post in index:
 		# check to see if the post with this name has already been downloaded
 		if library_entry_exists(username, post["data"]["name"]):
-			if load_library_entry_manifest(username, post['data']['name'])['completed'] == True:
+			manifest = load_library_entry_manifest(username, post['data']['name'])
+			if manifest['completed'] == True or manifest.get('returncodes'):
 				continue
 		
 		# likewise
@@ -83,7 +84,9 @@ def regenerate_jobs(username):
 		
 		if post['data'].get('domain') in domains_available:
 			jobs = [downloader.create_job(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
-			all_jobs.extend( [j for j in jobs if j is not None] ) # create_job can return None - filter them out here
+			jobs = [job for sublist in jobs for job in sublist]
+			jobs = [j for j in jobs if j is not None]
+			all_jobs.extend( jobs ) # create_job can return None - filter them out here
 			
 			# despite having downloaders with domains available, they produced no jobs.
 			# therefore we do not bother creating a folder/manifest.
@@ -137,6 +140,8 @@ def execute_job(username, name, force=False):
 	returncodes = []
 	
 	with open(f'user/{username}/library/{name}_commands.log', 'w') as cmdout:
+		cmdout.write('Started ')
+		cmdout.write(time.ctime() + '\n')
 		for command_args in manifest['commands']:
 			cmdout.write('Executing this command, then waiting:\n$ ')
 			cmdout.write(' '.join(command_args))
