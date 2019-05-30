@@ -18,18 +18,20 @@ IMAGE_DOMAINS = [
 def domains():
 	return VIDEO_DOMAINS + IMAGE_DOMAINS
 
-def create_job(item, library_folder, config, rs):
+def create_jobs(item, library_folder, config, rs):
 	domain = item['data']['domain']
+	
+	do_commands = []
 	
 	if domain not in domains():
 		raise NotImplementedError('Downloader default.py received an item with an unsupported domain.')
 	
 	if domain in VIDEO_DOMAINS or item['data']['url'].endswith('gifv'):
 		if 'youtu' in domain and rs.get('youtube', {}).get('download_videos', False) == False:
-			return None
+			return []
 		
 		if 'v.redd.it' in domain and rs.get('reddit', {}).get('download_reddit_video', True) == False:
-			return None
+			return []
 		
 		command = [
 			'youtube-dl',
@@ -41,7 +43,7 @@ def create_job(item, library_folder, config, rs):
 		]
 		
 		if domain == 'gfycat.com':
-			command.pop(command.index('--write-description')
+			command.pop(command.index('--write-description'))
 		
 		if 'proxy' in config:
 			command.extend( ['--proxy', config['proxy']] )
@@ -49,7 +51,7 @@ def create_job(item, library_folder, config, rs):
 		if 'youtu' in domain:
 			command.extend( ['--format', '720p[filesize<512MB]/720p60[filesize<512MB]/1080p[filesize<128MB]/1080p60[filesize<64MB]/best[filesize<512MB]'] )
 			
-		return command
+		do_commands.append(command)
 	
 	if domain in IMAGE_DOMAINS:
 		
@@ -66,4 +68,9 @@ def create_job(item, library_folder, config, rs):
 		if config.get('proxy'):
 			command += ['--proxy', config.get('proxy')]
 		
-		return command
+		do_commands.append(command)
+		
+		if domain == 'i.redd.it':
+			do_commands.append( ['echo', 'lmao'] )
+		
+	return do_commands
