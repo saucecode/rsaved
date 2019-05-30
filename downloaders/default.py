@@ -5,7 +5,8 @@ VIDEO_DOMAINS = [
 		'youtube.com',
 		'youtu.be',
 		'v.redd.it',
-		'gfycat.com'
+		'gfycat.com',
+		'm.youtube.com'
 	]
 
 IMAGE_DOMAINS = [
