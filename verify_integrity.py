@@ -13,7 +13,7 @@ __version__ = rsaved.__version__
 
 def check_files(username):
 	status = {
-		'cache_folder': os.path.exists(f'user/{username}/cache') and os.path.exists(f'user/{username}/cache/download_user'),
+		'cache_folder': os.path.exists(f'user/{username}/cache') and os.path.exists(f'user/{username}/cache/download_user') and os.path.exists(f'user/{username}/cache/history'),
 		'library_folder': os.path.exists(f'user/{username}/library'),
 		'config': os.path.exists(f'user/{username}/config.json'),
 		'rsaved': os.path.exists(f'user/{username}/rsaved.json'),

@@ -34,6 +34,7 @@ if __name__ == "__main__":
 	print(f'Creating folders for {username}...')
 	os.mkdir(f'user/{username}')
 	os.mkdir(f'user/{username}/cache')
+	os.mkdir(f'user/{username}/cache/history')
 	os.mkdir(f'user/{username}/cache/download_user')
 	os.mkdir(f'user/{username}/library')
 
