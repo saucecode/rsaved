@@ -23,7 +23,7 @@ def create_job(item, library_folder, config, rs):
 	if domain not in domains():
 		raise NotImplementedError('Downloader default.py received an item with an unsupported domain.')
 	
-	if domain in VIDEO_DOMAINS:
+	if domain in VIDEO_DOMAINS or item['data']['url'].endswith('gifv'):
 		if 'youtu' in domain and rs.get('youtube', {}).get('download_videos', False) == False:
 			return None
 		
@@ -34,6 +34,7 @@ def create_job(item, library_folder, config, rs):
 			'youtube-dl',
 			'--write-thumbnail',
 			'--write-description',
+			'--limit-rate', '2M', # 2 MB/s
 			'-o', f'{library_folder}/{domain}/{item["data"]["name"]}.%(title)s-%(id)s.%(ext)s',
 			item['data']['url']
 		]
@@ -42,7 +43,7 @@ def create_job(item, library_folder, config, rs):
 			command.extend( ['--proxy', config['proxy']] )
 		
 		if 'youtu' in domain:
-			command.extend( ['--format', '720p/720p60/1080p[filesize<64MB]/1080p60[filesize<64MB]/best'] )
+			command.extend( ['--format', '720p[filesize<512MB]/720p60[filesize<512MB]/1080p[filesize<128MB]/1080p60[filesize<64MB]/best[filesize<512MB]'] )
 			
 		return command
 	
@@ -53,9 +54,12 @@ def create_job(item, library_folder, config, rs):
 				return
 		
 		command = [
-			'wget',
+			'python3', 'rqget.py',
 			'-O', f'{library_folder}/{domain}/{item["data"]["name"]}.{item["data"]["url"].split("?")[0].split("/")[-1]}',
 			item['data']['url']
 		]
+		
+		if config.get('proxy'):
+			command += ['--proxy', config.get('proxy')]
 		
 		return command
