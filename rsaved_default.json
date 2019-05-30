@@ -16,5 +16,7 @@
 	
 	"youtube": {
 		"download_videos": false
-	}
+	},
+	
+	"version": "unset"
 }
