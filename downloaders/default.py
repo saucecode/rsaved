@@ -53,7 +53,7 @@ def create_jobs(item, library_folder, config, rs):
 			
 		do_commands.append(command)
 	
-	if domain in IMAGE_DOMAINS:
+	elif domain in IMAGE_DOMAINS:
 		
 		if domain == 'cdna.artstation.com':
 			if 'image/' not in mimetypes.guess_type(item['data']['url'].split('?')[0])[0]:

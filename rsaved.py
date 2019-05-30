@@ -35,7 +35,7 @@ def get_saved(username, after=None):
 		A requests.Response object of a saved feed page.
 	'''
 	config, rs = load_user_configs(username)
-	feed_url = f'https://www.reddit.com/user/{username}/saved.json?feed={rs["feed_id"]}&user={username}'
+	feed_url = f'https://www.reddit.com/user/{username}/saved.json?feed={rs["feed_id"]}&user={username}&limit=25'
 	if after: feed_url += f'&after={after}'
 	
 	return get_request(feed_url, config, rs)
@@ -83,10 +83,10 @@ def regenerate_jobs(username):
 			
 		
 		if post['data'].get('domain') in domains_available:
-			jobs = [downloader.create_job(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
+			jobs = [downloader.create_jobs(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
 			jobs = [job for sublist in jobs for job in sublist]
 			jobs = [j for j in jobs if j is not None]
-			all_jobs.extend( jobs ) # create_job can return None - filter them out here
+			all_jobs.extend( jobs ) # create_jobs can return None - filter them out here
 			
 			# despite having downloaders with domains available, they produced no jobs.
 			# therefore we do not bother creating a folder/manifest.

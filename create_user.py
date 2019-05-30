@@ -45,7 +45,7 @@ if __name__ == "__main__":
 	rsaved_default["username"] = username
 	rsaved_default["feed_id"] = feed_id
 	rsaved_default["created"] = int(time.time())
-	rsaved_default["version"] = VERSION
+	rsaved_default["version"] = __version__
 
 	with open(f'user/{username}/rsaved.json','w') as f: json.dump(rsaved_default, f, indent=4)
 	with open(f'user/{username}/config.json','w') as f: json.dump(config_default, f, indent=4)
