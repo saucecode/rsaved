@@ -72,7 +72,7 @@ def regenerate_jobs(username):
 				continue
 		
 		if post['data'].get('domain') in domains_available:
-			jobs = [downloader.create_job(post, f'user/{username}/library/{post["data"]["name"]}', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
+			jobs = [downloader.create_job(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
 			all_jobs.extend( [j for j in jobs if j is not None] ) # create_job can return None - filter them out here
 			
 			# despite having downloaders with domains available, they produced no jobs.
@@ -81,16 +81,16 @@ def regenerate_jobs(username):
 				continue
 				
 			try:
-				os.mkdir(f'user/{username}/library/{post["data"]["name"]}')
+				os.mkdir(f'user/{username}/library/{post["data"]["domain"]}')
 			except FileExistsError:
 				pass
-			with open(f'user/{username}/library/{post["data"]["name"]}/manifest.json', 'w') as f:
-				json.dump({
+			
+			dump_library_entry_manifest(username, post['data']['name'], {
 					'generated': int(time.time()),
 					'completed': False,
 					'name': post['data']['name'],
 					'commands': jobs
-				}, f, indent=4)
+				}, indent=4)
 	
 	with open(f'user/{username}/jobs.json', 'w') as f:
 		json.dump(all_jobs, f, indent=4)
@@ -100,13 +100,13 @@ def regenerate_jobs(username):
 def execute_job(username, name, force=False):
 	'''Executes a job by name.
 	
-	The commands are found in user/username/library/name/manifest.json.
+	The commands are found in user/username/library/name.json.
 	These files are written when `regenerate_jobs()` is called.
 	
 	The job is marked completed if all commands executed return exit code 0.
 	
-	Debug information about the command execution is written to the library name
-	folder under commands.log.
+	Output from the commands' executions is written to the library
+	folder under name_commands.log.
 	
 	Args:
 		username: The username of the user.
@@ -117,7 +117,7 @@ def execute_job(username, name, force=False):
 		A list of return codes of all the commands run.
 	'''
 	if not library_entry_exists(username, name):
-		raise FileNotFoundError(f'Could not find manifest.json for {username}\'s library under name {name}')
+		raise FileNotFoundError(f'Could not find manifest {name}.json in {username}\'s library.')
 	
 	manifest = load_library_entry_manifest(username, name)
 	
@@ -126,7 +126,7 @@ def execute_job(username, name, force=False):
 	
 	returncodes = []
 	
-	with open(f'user/{username}/library/{name}/commands.log', 'w') as cmdout:
+	with open(f'user/{username}/library/{name}_commands.log', 'w') as cmdout:
 		for command_args in manifest['commands']:
 			cmdout.write('Executing this command, then waiting:\n$ ')
 			cmdout.write(' '.join(command_args))
@@ -150,15 +150,15 @@ def execute_job(username, name, force=False):
 ### Lots and lots of loading/dumping/exists functions
 
 def library_entry_exists(username, name):
-	return os.path.exists(f'user/{username}/library/{name}/manifest.json')
+	return os.path.exists(f'user/{username}/library/{name}.json')
 
 def load_library_entry_manifest(username, name):
-	with open(f'user/{username}/library/{name}/manifest.json', 'r') as f:
+	with open(f'user/{username}/library/{name}.json', 'r') as f:
 		return json.load(f)
 
-def dump_library_entry_manifest(username, name, manifest):
-	with open(f'user/{username}/library/{name}/manifest.json', 'w') as f:
-		json.dump(manifest, f)
+def dump_library_entry_manifest(username, name, manifest, indent=None):
+	with open(f'user/{username}/library/{name}.json', 'w') as f:
+		json.dump(manifest, f, indent=indent)
 
 def load_user_configs(username):
 	with open(f'user/{username}/config.json','r') as f: config = json.load(f)
