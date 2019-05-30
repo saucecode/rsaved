@@ -1,7 +1,7 @@
 rsaved
 ======
 
-A Python 3.6 utility for mirroring personal reddit.com/saved feeds.
+A Python 3.6 utility for mirroring personal reddit.com/saved feeds, and the content on these feeds.
 
 ## How to use
 
@@ -20,6 +20,34 @@ This will start downloading all your saved reddit posts. It takes me around 15 s
     $ python3 review_user.py [your reddit username]
 
 This (for now) creates a file `index_review.txt` in your user folder. If it shows an approximate view of what your own reddit.com/saved page looks like, then you know its done its job.
+
+If that all worked, you're all set to start downloading the actual pictures/videos that you've saved locally. Beware, this can take some time, especially if you save a lot of videos.
+
+    $ python3 scrape_for_user.py [your reddit username]
+
+You can configure a few aspects of this process in the `rsaved.json` and `config.json` files created in your user's folder. Not everything is implemented.
+
+
+### Configuration Files
+Every user gets two configuration files: `rsaved.json` and `config.json`.
+
+`rsaved.json` controls what you end up downloading. `config.json` controls *how* you download it. In the `config.json` you can set a custom User-Agent and specify a proxy (only SOCKS5 tested - HTTP/HTTPS will probably work).
+
+### index.pickle.gz
+
+This is where a lot of the magic happens - this file (once updated) contains the information about every saved post for this user. Let me tell you how to use it.
+
+    import rsaved
+    index = rsaved.load_index('your_username') # returns the content of index.pickle.gz
+    
+    # print the URL of all the save posts from /r/aww.
+    for item in index:
+        if item['data']['subreddit'] == 'aww':
+            print(item['data']['url'])
+    
+    # if you're not yet familiar with the reddit object structure, familiarize yourself now
+    import json
+    print( json.dumps(index[0], indent=4) )
 
 ## Why?
 
