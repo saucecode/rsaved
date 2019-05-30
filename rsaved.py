@@ -65,11 +65,21 @@ def regenerate_jobs(username):
 	
 	all_jobs = []
 	
+	# determine the `name`s of currently downloaded files
+	library_folder = f'user/{username}/library'
+	domain_directories = [d for d in os.listdir(library_folder) if os.path.isdir(f'{library_folder}/{d}')]
+	domain_file_names = [file.split('.')[0] for d in domain_directories for file in os.listdir(f'{library_folder}/{d}')]
+	
 	for post in index:
 		# check to see if the post with this name has already been downloaded
 		if library_entry_exists(username, post["data"]["name"]):
 			if load_library_entry_manifest(username, post['data']['name'])['completed'] == True:
 				continue
+		
+		# likewise
+		if post['data']['name'] in domain_file_names:
+			continue
+			
 		
 		if post['data'].get('domain') in domains_available:
 			jobs = [downloader.create_job(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
