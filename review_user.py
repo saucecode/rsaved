@@ -49,6 +49,7 @@ if __name__ == "__main__":
 	print('Loading index for', username, '...')
 	index = rsaved.load_index(username)
 	
+	print('Writing index review...')
 	with open(f'user/{username}/index_review.txt', 'w') as stream:
 		stream.write(f'rsaved/{__version__} review_user.py generated this file for\n')
 		stream.write(f'{username} on {time.ctime()}. There are {len(index)} entries.\n')
@@ -57,6 +58,7 @@ if __name__ == "__main__":
 		for item in index:
 			write_item_to_stream(item, stream)
 	
+	print('Writing names (boring debug stuff)...')
 	with open(f'user/{username}/index_names.txt', 'w') as f:
 		f.write(f'Generated on {time.ctime()}\n\n')
 		index_names = rsaved.load_index_names(username)
@@ -64,5 +66,14 @@ if __name__ == "__main__":
 			f.write(', '.join(sublist))
 			f.write('\n')
 	
-	print('Done. Launching viewer...')
-	subprocess.call(['mousepad', f'user/{username}/index_review.txt'])
+	# next line is hard to read. read it twice.
+	all_domains = [item['data'].get('domain', '/r/'+item['data'].get('subreddit')) for item in index]
+	domain_counts = {domain:all_domains.count(domain) for domain in set(all_domains)}
+	
+	print('Writing domain review...')
+	with open(f'user/{username}/domains_review.txt', 'w') as f:
+		for key, value in sorted(domain_counts.items(), reverse=True, key=lambda x: x[1]):
+			f.write(key)
+			f.write(' ')
+			f.write(str(value))
+			f.write('\n')
