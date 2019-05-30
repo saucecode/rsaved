@@ -40,6 +40,9 @@ def create_job(item, library_folder, config, rs):
 			item['data']['url']
 		]
 		
+		if domain == 'gfycat.com':
+			command.pop(command.index('--write-description')
+		
 		if 'proxy' in config:
 			command.extend( ['--proxy', config['proxy']] )
 		

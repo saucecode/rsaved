@@ -1,6 +1,6 @@
-# rqget.py/0.42
+# rqget.py/0.43
 # this is a drop-in replacement for wget.
-#it takes two optional arguments, but it really works best if you specify them.
+# it takes two optional arguments, but it really works best if you specify them.
 
 # I can't believe I had to write this. I couldn't get socks5 to work for wget or curl.
 # Please forgive this.
@@ -47,9 +47,7 @@ if output is None:
 	if temp.endswith('/'):
 		output = temp.split('/')[-2] + '.html'
 
-print('Output:', output)
-print('Proxy:', proxy)
-print('URL:', url)
+print(url, '->', output)
 
 def download_file(url, proxy, output):
 	local_filename = output
