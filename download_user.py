@@ -154,3 +154,5 @@ if __name__ == "__main__":
 	
 	count = add_to_index(username, data)
 	print(count,'of these posts were new, and added to the index.')
+	
+	rsaved.regenerate_jobs(username)
