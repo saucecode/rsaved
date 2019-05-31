@@ -27,6 +27,20 @@ def get_request(url, config, rs, session=None):
 def get_saved(username, after=None):
 	'''Retrieves a single saved feed page.
 	
+	A note on reddit post objects: They look like this:
+	{
+		'kind': 't3',
+		'data' [
+			'title': 'Something',
+			'url': 'http://samthing/'
+			'score': 12345,
+			...
+		}
+	}
+	
+	This comes directly from reddit.com produced json responses and is not modified,
+	but metadata is added by these scripts.
+	
 	Args:
 		username: The username to retrieve for.
 		after: Post name that preceeds the requested page.
@@ -40,7 +54,7 @@ def get_saved(username, after=None):
 	
 	return get_request(feed_url, config, rs)
 
-def regenerate_jobs(username):
+def regenerate_jobs(username, force=False):
 	'''Generates a list of console commands that need to be run in order to update the user's library.
 	
 	This list is written to jobs.txt in the user's folder.
@@ -52,6 +66,10 @@ def regenerate_jobs(username):
 			subprocess.call(job)
 	
 	This will almost definitely change.
+	
+	Args:
+		username: username
+		force: If True, (re)generates job files for everything in the index, even if they have already been downloaded.
 	
 	Returns:
 		The list of commands.
@@ -72,13 +90,13 @@ def regenerate_jobs(username):
 	
 	for post in index:
 		# check to see if the post with this name has already been downloaded
-		if library_entry_exists(username, post["data"]["name"]):
+		if library_entry_exists(username, post["data"]["name"]) and not force:
 			manifest = load_library_entry_manifest(username, post['data']['name'])
 			if manifest['completed'] == True or manifest.get('returncodes'):
 				continue
 		
 		# likewise
-		if post['data']['name'] in domain_file_names:
+		if post['data']['name'] in domain_file_names and not force:
 			continue
 			
 		
@@ -95,6 +113,10 @@ def regenerate_jobs(username):
 				
 			try:
 				os.mkdir(f'user/{username}/library/{post["data"]["domain"]}')
+			except FileExistsError:
+				pass
+			try:
+				os.mkdir(f'user/{username}/library/{post["data"]["domain"]}/thumbs')
 			except FileExistsError:
 				pass
 			
@@ -142,23 +164,41 @@ def execute_job(username, name, force=False):
 	with open(f'user/{username}/library/{name}_commands.log', 'w') as cmdout:
 		cmdout.write('Started ')
 		cmdout.write(time.ctime() + '\n')
-		for command_args in manifest['commands']:
+		
+		metadata, commands = manifest['commands'][0], manifest['commands'][1:]
+		
+		for command_args in commands:
 			cmdout.write('Executing this command, then waiting:\n$ ')
 			cmdout.write(' '.join(command_args))
-			cmdout.write('\n')
+			cmdout.write('\n\n')
 			cmdout.flush()
+			
 			proc = subprocess.Popen(command_args, stdout=cmdout, stderr=cmdout)
 			retcode = proc.wait()
+			
 			cmdout.write(f'\nDone ({retcode})\n\n')
 			returncodes.append(retcode)
 	
 	manifest['returncodes'] = returncodes
 	
-	if all(code == 0 for code in returncodes): manifest['completed'] = True
+	if all(code == 0 for code in returncodes):
+		manifest['completed'] = True
+		metadata['jobs_completed'] = int(time.time())
+		merge_job_metadata(username, name, metadata)
 	
 	dump_library_entry_manifest(username, name, manifest)
 	
 	return returncodes
+
+def merge_job_metadata(username, name, metadata):
+	manifest = load_library_entry_manifest(username, name)
+	index = load_index(username)
+	
+	corresponding_item_index = next( idx for idx, item in enumerate(index) if item['data']['name'] == name )
+	index[corresponding_item_index]['rsaved']['download'] = metadata
+	
+	dump_index(username, index)
+	
 
 def library_clean_completed(username):
 	'''Cleans out manifest and *_commands.log files of completed downloads from the library folder.
