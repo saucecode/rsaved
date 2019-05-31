@@ -40,6 +40,37 @@ import time
 				background: #ddf;
 				padding-left: 4px;
 			}
+
+			div.nsfw {
+				background: url('/res/nsfw.png');
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			div.nsfw img {
+				opacity: 0;
+			}
+			div.entry:hover div.nsfw img {
+				opacity: 1;
+			}
+			
+			span.author {
+				text-decoration: underline;
+			}
+			
+			input[type="checkbox"] {
+				width: 24px;
+				height: 24px;
+			}
+			.preview {
+				display: none;
+			}
+			.preview img {
+				max-height: 60vh;
+				width: auto;
+			}
+			input[type="checkbox"]:checked ~ .preview {
+				display: block;
+			}
 		</style>
 	</head>
 	<body>
@@ -54,12 +85,20 @@ import time
 				<div class="entry">
 					<div class="left">{{idx+1+after_index}}</div>
 					<div class="left"><span class="score">{{score}}</span></div>
-					<div class="left"><img src="/u/{{username}}/res/{{domain}}/thumbs/{{name}}" /></div>
+					<div class="{{'left nsfw' if data.get('over_18',False) else 'left'}}"><img src="/u/{{username}}/res/{{domain}}/thumbs/{{name}}" /></div>
 					<div class="right">
 						<a href="/u/{{username}}/res/{{domain}}/{{name}}">{{title}}</a>
 						<small class="domain">({{domain}})</small><br/>
+						%if data.get('over_18', False):
+						<span class="nsfw">NSFW</span>
+						%end
+						<small>
+							<span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}}.
+							<a href="{{data['url']}}">permalink</a>
+						</small><br/>
 						
-						<small>posted at {{time.ctime(data['created'])}}</small>
+						<input type="checkbox" />
+						<div class="preview"> <img src="/u/{{username}}/res/{{domain}}/{{name}}" /> </div>
 					</div>
 				</div>
 				
@@ -71,7 +110,7 @@ import time
 						<small>Comment on</small>
 						<a href="/u/{{username}}/res/{{data.get('subreddit')}}/{{data['name']}}">{{data.get('link_title')}}</a>
 						<small class="domain">({{data.get('subreddit')}})</small><br/>
-						<small>posted at {{time.ctime(data['created'])}}</small><br/>
+						<small><span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}}</small><br/>
 						
 						<p class="comment">
 							{{data['body']}}

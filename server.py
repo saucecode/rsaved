@@ -12,7 +12,7 @@ def userPage(username=None):
 		return abort(404, 'No such user')
 	
 	after = request.query.after or None
-	limit = int(request.query.limit or 25)
+	limit = int(request.query.limit or 100)
 	
 	index = rsaved.load_index(username)
 	
@@ -48,5 +48,9 @@ def getResourceThumb(username, domain, name):
 	file = next(f for f in os.listdir(thumbs_folder) if f.startswith(name))
 	
 	return static_file(file, root=thumbs_folder)
+
+@route('/res/<fname>')
+def getStaticResource(fname):
+	return static_file(fname, root='res')
 
 run(host='localhost', port=8080, debug=True, reloader=True)
