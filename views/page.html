@@ -18,12 +18,14 @@ import time
 				display: block;
 			}
 			
-			div.right {
+			div.left img {
+				width: 64px;
+				height: auto;
 			}
 			
 			div.entry {
 				margin-bottom: 12px;
-				max-width: 50%;
+				max-width: 80%;
 				display: flex;
 				align-items: stretch;
 			}
@@ -52,6 +54,7 @@ import time
 				<div class="entry">
 					<div class="left">{{idx+1+after_index}}</div>
 					<div class="left"><span class="score">{{score}}</span></div>
+					<div class="left"><img src="/u/{{username}}/res/{{domain}}/thumbs/{{name}}" /></div>
 					<div class="right">
 						<a href="/u/{{username}}/res/{{domain}}/{{name}}">{{title}}</a>
 						<small class="domain">({{domain}})</small><br/>

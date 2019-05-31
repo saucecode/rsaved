@@ -38,4 +38,15 @@ def getResource(username, domain, name):
 		
 	return str(files)
 
+@route('/u/<username>/res/<domain>/thumbs/<name>')
+def getResourceThumb(username, domain, name):
+	thumbs_folder = f'user/{username}/library/{domain}/thumbs'
+	
+	if not os.path.exists(thumbs_folder):
+		return abort(404, 'Resource not found')
+	
+	file = next(f for f in os.listdir(thumbs_folder) if f.startswith(name))
+	
+	return static_file(file, root=thumbs_folder)
+
 run(host='localhost', port=8080, debug=True, reloader=True)
