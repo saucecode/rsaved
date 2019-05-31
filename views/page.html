@@ -6,72 +6,7 @@ import time
 <html>
 	<head>
 		<title>User Page</title>
-		<style>
-			body {
-				font-family: sans-serif;
-			}
-			
-			div.left {
-				min-width: 64px;
-				text-align: center;
-				color: #aaa;
-				display: block;
-			}
-			
-			div.left img {
-				width: 64px;
-				height: auto;
-			}
-			
-			div.entry {
-				margin-bottom: 12px;
-				max-width: 80%;
-				display: flex;
-				align-items: stretch;
-			}
-			
-			small.domain {
-				font-style: italic;
-			}
-			
-			p.comment {
-				font-size: small;
-				border-left: 4px solid #55f;
-				background: #ddf;
-				padding-left: 4px;
-			}
-
-			div.nsfw {
-				background: url('/res/nsfw.png');
-				background-size: contain;
-				background-repeat: no-repeat;
-			}
-			div.nsfw img {
-				opacity: 0;
-			}
-			div.entry:hover div.nsfw img {
-				opacity: 1;
-			}
-			
-			span.author {
-				text-decoration: underline;
-			}
-			
-			input[type="checkbox"] {
-				width: 24px;
-				height: 24px;
-			}
-			.preview {
-				display: none;
-			}
-			.preview img {
-				max-height: 60vh;
-				width: auto;
-			}
-			input[type="checkbox"]:checked ~ .preview {
-				display: block;
-			}
-		</style>
+		<link rel="stylesheet" href="/res/page.css" type="text/css" />
 	</head>
 	<body>
 			%for idx, item in enumerate(index_segment):
