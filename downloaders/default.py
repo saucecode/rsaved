@@ -18,7 +18,7 @@ IMAGE_DOMAINS = [
 def domains():
 	return VIDEO_DOMAINS + IMAGE_DOMAINS
 
-def create_jobs(item, library_folder, config, rs):
+def create_jobs(item, library_folder, config, rs, jobs):
 	domain = item['data']['domain']
 	name = item["data"]["name"]
 	
@@ -33,7 +33,7 @@ def create_jobs(item, library_folder, config, rs):
 		
 	# check for a thumbnail from reddit
 	thumbnail = item['data']['thumbnail']
-	if thumbnail and type(thumbnail) == str:
+	if thumbnail and type(thumbnail) == str and thumbnail.startswith('http'):
 		ext = thumbnail.split('?')[0].split('.')[-1]
 		fname = f'{name}.thumb_small.{ext}'
 		metadata['thumb'] = fname
@@ -100,6 +100,6 @@ def create_jobs(item, library_folder, config, rs):
 			do_commands.append( ['echo', 'lmao'] )
 	
 	if len(do_commands) > 0:
-		return [metadata] + do_commands
+		jobs.extend( [metadata] + do_commands )
 	else:
 		return []

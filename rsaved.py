@@ -77,8 +77,8 @@ def regenerate_jobs(username, force=False):
 	config, rs = load_user_configs(username)
 	index = load_index(username)
 	
-	from downloaders import default
-	downloaders = [default]
+	from downloaders import default, star
+	downloaders = [default, star]
 	domains_available = set([j for i in downloaders for j in i.domains()])
 	
 	all_jobs = []
@@ -100,32 +100,38 @@ def regenerate_jobs(username, force=False):
 			continue
 			
 		
-		if post['data'].get('domain') in domains_available:
-			jobs = [downloader.create_jobs(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains()]
-			jobs = [job for sublist in jobs for job in sublist]
-			jobs = [j for j in jobs if j is not None]
-			all_jobs.extend( jobs ) # create_jobs can return None - filter them out here
+		# *fuck this shit i'm out
+		# jobs = [downloader.create_jobs(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains() or len(downloader.domains()) == 0]
+		
+		jobs = []
+		for downloader in downloaders:
+			if post['data'].get('domain', '') in downloader.domains() or len(downloader.domains()) == 0:
+				downloader.create_jobs(post, f'user/{username}/library', config, rs, jobs)
 			
-			# despite having downloaders with domains available, they produced no jobs.
-			# therefore we do not bother creating a folder/manifest.
-			if not any(jobs):
-				continue
-				
-			try:
-				os.mkdir(f'user/{username}/library/{post["data"]["domain"]}')
-			except FileExistsError:
-				pass
-			try:
-				os.mkdir(f'user/{username}/library/{post["data"]["domain"]}/thumbs')
-			except FileExistsError:
-				pass
+		# jobs = [job for sublist in jobs for job in sublist]
+		jobs = [j for j in jobs if j is not None]
+		all_jobs.extend( jobs ) # create_jobs can return None - filter them out here
+		
+		# despite having downloaders with domains available, they produced no jobs.
+		# therefore we do not bother creating a folder/manifest.
+		if not any(jobs):
+			continue
 			
-			dump_library_entry_manifest(username, post['data']['name'], {
-					'generated': int(time.time()),
-					'completed': False,
-					'name': post['data']['name'],
-					'commands': jobs
-				}, indent=4)
+		try:
+			os.mkdir(f'user/{username}/library/{post["data"]["domain"]}')
+		except FileExistsError:
+			pass
+		try:
+			os.mkdir(f'user/{username}/library/{post["data"]["domain"]}/thumbs')
+		except FileExistsError:
+			pass
+		
+		dump_library_entry_manifest(username, post['data']['name'], {
+				'generated': int(time.time()),
+				'completed': False,
+				'name': post['data']['name'],
+				'commands': jobs
+			}, indent=4)
 	
 	with open(f'user/{username}/jobs.json', 'w') as f:
 		json.dump(all_jobs, f, indent=4)
