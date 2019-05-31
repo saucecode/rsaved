@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Home</title>
+	</head>
+	<body>
+		<ul>
+			%for username in usernames:
+			<li><a href="/u/{{username}}/">{{username}}</a></li>
+			%end
+		</ul>
+	</body>
+</html>

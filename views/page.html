@@ -1,0 +1,85 @@
+<%
+import time
+
+%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>User Page</title>
+		<style>
+			body {
+				font-family: sans-serif;
+			}
+			
+			div.left {
+				min-width: 64px;
+				text-align: center;
+				color: #aaa;
+				display: block;
+			}
+			
+			div.right {
+			}
+			
+			div.entry {
+				margin-bottom: 12px;
+				max-width: 50%;
+				display: flex;
+				align-items: stretch;
+			}
+			
+			small.domain {
+				font-style: italic;
+			}
+			
+			p.comment {
+				font-size: small;
+				border-left: 4px solid #55f;
+				background: #ddf;
+				padding-left: 4px;
+			}
+		</style>
+	</head>
+	<body>
+			%for idx, item in enumerate(index_segment):
+			%data = item['data']
+				%if item['kind'] == 't3':
+				%title = data['title']
+				%domain = data['domain']
+				%name = data['name']
+				%score = data['score']
+				
+				<div class="entry">
+					<div class="left">{{idx+1+after_index}}</div>
+					<div class="left"><span class="score">{{score}}</span></div>
+					<div class="right">
+						<a href="/u/{{username}}/res/{{domain}}/{{name}}">{{title}}</a>
+						<small class="domain">({{domain}})</small><br/>
+						
+						<small>posted at {{time.ctime(data['created'])}}</small>
+					</div>
+				</div>
+				
+				%elif item['kind'] == 't1':
+				<div class="entry">
+					<div class="left">{{idx+1+after_index}}</div>
+					<div class="left">{{data['score']}}</div>
+					<div class="right">
+						<small>Comment on</small>
+						<a href="/u/{{username}}/res/{{data.get('subreddit')}}/{{data['name']}}">{{data.get('link_title')}}</a>
+						<small class="domain">({{data.get('subreddit')}})</small><br/>
+						<small>posted at {{time.ctime(data['created'])}}</small><br/>
+						
+						<p class="comment">
+							{{data['body']}}
+						</p>
+						
+					</div>
+				</div>
+				%end
+				
+			%end
+			
+			<a href="/u/{{username}}/?after={{index_segment[-1]['data']['name']}}&limit={{limit}}">Next Page</a>
+	</body>
+</html>
