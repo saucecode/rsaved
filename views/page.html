@@ -33,7 +33,15 @@ import time
 						</small><br/>
 						
 						<input type="checkbox" />
-						<div class="preview"> <img src="/u/{{username}}/res/{{domain}}/{{name}}" /> </div>
+						<div class="preview">
+							%if item['rsaved'].get('download', {}).get('class') == 'video':
+							<video>
+								<source src="/u/{{username}}/res/{{domain}}/{{name}}" type="{{getLibraryResourceMimetype(username, domain, name)}}" />
+							</video>
+							%else:
+							<img src="/u/{{username}}/res/{{domain}}/{{name}}" />
+							%end
+						</div>
 					</div>
 				</div>
 				

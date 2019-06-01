@@ -1,4 +1,4 @@
-import os, rsaved, time
+import os, rsaved, time, mimetypes
 
 from bottle import route, run, template, abort, static_file, request
 
@@ -22,7 +22,13 @@ def userPage(username=None):
 	except ValueError:
 		after_index = 0
 	
-	return template('page.html', limit=limit, after_index=after_index, index_segment=index[after_index:after_index+limit], username=username)
+	return template('page.html',
+		limit=limit,
+		after_index=after_index,
+		index_segment=index[after_index:after_index+limit],
+		username=username,
+		getLibraryResourceMimetype=getLibraryResourceMimetype
+	)
 
 @route('/u/<username>/res/<domain>/<name>')
 def getResource(username, domain, name):
@@ -52,5 +58,15 @@ def getResourceThumb(username, domain, name):
 @route('/res/<fname>')
 def getStaticResource(fname):
 	return static_file(fname, root='res')
+
+def getLibraryResourceMimetype(username, domain, name):
+	domain_folder = f'user/{username}/library/{domain}'
+	
+	if not os.path.exists(domain_folder):
+		return abort(404, 'Resource not found')
+	
+	file = next(f for f in os.listdir(domain_folder) if f.startswith(name))
+	
+	return mimetypes.guess_type(file)[0]
 
 run(host='localhost', port=8080, debug=True, reloader=True)
