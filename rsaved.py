@@ -231,10 +231,9 @@ def library_clean_completed(username):
 		name = fname.split('.')[0]
 		
 		manifest = load_library_entry_manifest(username, name)
-		if manifest['completed'] == True:
-			os.rename(f"{library_folder}/{fname}", f"{history_folder}/{timestamp}/{fname}")
-			os.rename(f"{library_folder}/{name}_commands.log", f"{history_folder}/{timestamp}/{name}_commands.log")
-			cleaned += 1
+		os.rename(f"{library_folder}/{fname}", f"{history_folder}/{timestamp}/{fname}")
+		os.rename(f"{library_folder}/{name}_commands.log", f"{history_folder}/{timestamp}/{name}_commands.log")
+		cleaned += 1
 
 	with tarfile.open(f'{history_folder}/{timestamp}.bz2', 'w:bz2') as t:
 		for fname in os.listdir(f'{history_folder}/{timestamp}'):
