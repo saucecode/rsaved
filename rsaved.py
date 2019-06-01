@@ -77,8 +77,8 @@ def regenerate_jobs(username, force=False):
 	config, rs = load_user_configs(username)
 	index = load_index(username)
 	
-	from downloaders import default, star
-	downloaders = [default, star]
+	from downloaders import default, star, imgur_album
+	downloaders = [default, imgur_album, star]
 	domains_available = set([j for i in downloaders for j in i.domains()])
 	
 	all_jobs = []
