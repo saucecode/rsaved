@@ -98,7 +98,10 @@ def regenerate_jobs(username, force=False):
 		# likewise
 		if post['data']['name'] in domain_file_names and not force:
 			continue
-			
+		
+		# check to see if the post was marked ignored
+		if post['rsaved'].get('ignore') and not force:
+			continue
 		
 		# *fuck this shit i'm out
 		# jobs = [downloader.create_jobs(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains() or len(downloader.domains()) == 0]
