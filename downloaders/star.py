@@ -19,12 +19,12 @@ def create_jobs(item, library_folder, config, rs, jobs):
 	# this object gets attached after
 	metadata = {'downloader_version': 'star/1.0', 'jobs_generated': int(time.time())}
 	
-	mime = mimetypes.guess_type(item['data'].get('url', ''))[0]
+	mime = mimetypes.guess_type(item['data'].get('url', '').split('?')[0])[0]
 	
 	if mime and mime.startswith('image/'):
 		command = [
 			'python3', 'rqget.py',
-			'-O', f'{library_folder}/{domain}/{name}.{item["data"]["url"].split("/")[-1]}',
+			'-O', f'{library_folder}/{domain}/{name}.{item["data"]["url"].split("/")[-1].split("?")[0]}',
 			item['data']['url']
 		]
 		
