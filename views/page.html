@@ -7,6 +7,21 @@ import time
 	<head>
 		<title>User Page</title>
 		<link rel="stylesheet" href="/res/page.css" type="text/css" />
+		<script type="text/javascript">
+			function togglePreview(cb) {
+				var div = cb.nextElementSibling; // TIL this is a thing
+				if(cb.checked) {
+					child = div.children[0];
+					
+					if(child.tagName == "IMG")
+						child.setAttribute( "src", div.children[0].getAttribute("data-src") );
+					
+					div.setAttribute("style", "display:block;");
+				}else{
+					div.setAttribute("style", "display:none;");
+				}
+			}
+		</script>
 	</head>
 	<body>
 			%for idx, item in enumerate(index_segment):
@@ -32,14 +47,14 @@ import time
 							<a href="{{data['url']}}">permalink</a>
 						</small><br/>
 						
-						<input type="checkbox" />
+						<input type="checkbox" onclick="togglePreview(this);" autocomplete="off" />
 						<div class="preview">
 							%if item['rsaved'].get('download', {}).get('class') == 'video':
-							<video>
+							<video controls="controls" preload="none">
 								<source src="/u/{{username}}/res/{{domain}}/{{name}}" type="{{getLibraryResourceMimetype(username, domain, name)}}" />
 							</video>
 							%else:
-							<img src="/u/{{username}}/res/{{domain}}/{{name}}" />
+							<img data-src="/u/{{username}}/res/{{domain}}/{{name}}" />
 							%end
 						</div>
 					</div>
