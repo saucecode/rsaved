@@ -54,7 +54,11 @@ def getResource(username, domain, name):
 	if not os.path.exists(domain_folder):
 		return abort(404, 'Resource not found')
 	
-	index = cached_indices[username]
+	if not username in cached_indices:
+		cached_indices[username] = rsaved.load_index(username)
+		
+	index = cached_indices.get(username)
+	
 	corresponding_item = next(i for i in index if i['data']['name'] == name)
 	
 	files = [f for f in os.listdir(domain_folder) if f.startswith(name)]
@@ -69,7 +73,15 @@ def getResource(username, domain, name):
 				albumid = corresponding_item['rsaved']['download']['albumid']
 				return '<br/>'.join([ f'<img src="/u/{username}/res/{domain}/{name}.{albumid}/{i}" />' for i in os.listdir(f'{domain_folder}/{name}.{albumid}')])
 		
-	return str(files) + '\n\n' + json.dumps(corresponding_item, indent=4)
+	return getMultifileResource(username, domain, name, files, corresponding_item)
+
+def getMultifileResource(username, domain, name, files, item):
+	if item['rsaved']['download']['class'] == 'video':
+		if len(files) >= 2 \
+		and any( [file.endswith('.description') for file in files] ) \
+		and any( ['video' in (mimetypes.guess_type(file)[0] or '') for file in files] ):
+			return template('video.html', data=[username, domain, name, files, item])
+	return str(files) + '\n\n' + json.dumps(item, indent=4)
 
 @route('/u/<username>/res/<domain>/<name>/<fname>')
 def getResourceFromFolder(username, domain, name, fname):
@@ -80,6 +92,10 @@ def getResourceFromFolder(username, domain, name, fname):
 @route('/res/<fname>')
 def getStaticResource(fname):
 	return static_file(fname, root='res')
+
+@route('/u/<username>/get/<path:path>')
+def getUserResource(username, path):
+	return static_file(path, root=f'user/{username}/library')
 
 def getLibraryResourceMimetype(username, domain, name):
 	domain_folder = f'user/{username}/library/{domain}'

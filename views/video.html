@@ -1,0 +1,37 @@
+<%
+	import mimetypes
+	[username, domain, name, files, item] = data
+	
+	video_file = next( (file for file in files if 'video' in (mimetypes.guess_type(file)[0] or '')), None )
+	splash_file = next( (file for file in files if 'image' in (mimetypes.guess_type(file)[0] or '')), None )
+	description_file = next( (file for file in files if file.endswith('.description')), None )
+%>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Video</title>
+	</head>
+	<body>
+		<video controls="controls" preload="none" poster="/u/{{username}}/get/{{domain}}/{{splash_file}}">
+			<source src="/u/{{username}}/get/{{domain}}/{{video_file}}" type="{{mimetypes.guess_type(video_file)[0]}}" />
+		</video>
+		
+		<br/>
+		
+		<p>Loading description from <a href="/u/{{username}}/get/{{domain}}/{{description_file}}">here</a>...</p>
+		<pre id="description"></pre>
+		
+		<script>
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("GET", "/u/{{username}}/get/{{domain}}/{{description_file}}", true);
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					document.getElementById("description").innerHTML = this.responseText;
+				}
+			};
+			xhttp.send();
+		</script>
+		
+	</body>
+</html>
