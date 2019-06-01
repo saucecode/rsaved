@@ -3,15 +3,19 @@ import sys, json, os, pickle, time
 
 __version__ = rsaved.__version__
 
-def print_job(job):
+def print_job(job, item):
 	sprint = lambda *x: [time.sleep(0.2), print(*x)]
 	
+	sprint()
 	sprint('Name:', job['name'], 'Completed:', job['completed'])
+	sprint('Title:', item['data'].get('title'))
+	sprint('URL:', item['data'].get('url'))
 	sprint('Commands:')
 	for code, cmd in zip(job['returncodes'], job['commands'][1:]):
 		sprint('    $', ' '.join(cmd))
 		sprint('Exit code:', code)
 		sprint()
+	sprint()
 
 if __name__ == "__main__":
 	print(f'rsaved/{__version__} clean_user.py')
@@ -39,10 +43,10 @@ if __name__ == "__main__":
 	print('I will now enumerate through them.')
 	
 	for job in errored_jobs:
-		print_job(job)
+		item = next(i for i in index if i['data']['name'] == job['name'])
+		print_job(job, item)
 		
 		if input(f'Would you like to mark item {job["name"]} as ignored? [Y/n] ').lower() != 'n':
-			item = next(i for i in index if i['data']['name'] == job['name'])
 			item['rsaved']['ignore'] = True
 			print('Ignored.')
 			changes_made = True
