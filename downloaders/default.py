@@ -19,6 +19,9 @@ def domains():
 	return VIDEO_DOMAINS + IMAGE_DOMAINS
 
 def create_jobs(item, library_folder, config, rs, jobs):
+	if len(jobs) > 0:
+		return
+	
 	domain = item['data']['domain']
 	name = item["data"]["name"]
 	

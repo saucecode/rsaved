@@ -6,6 +6,8 @@ def domains():
 	return []
 
 def create_jobs(item, library_folder, config, rs, jobs):
+	if len(jobs) > 0:
+		return
 	name = item["data"]["name"]
 	domain = item["data"].get('domain')
 

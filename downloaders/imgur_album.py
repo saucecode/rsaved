@@ -10,6 +10,8 @@ def domains():
 	return 'imgur.com'
 
 def create_jobs(item, library_folder, config, rs, jobs):
+	if len(jobs) > 0:
+		return
 	name = item["data"]["name"]
 	
 	if not re.match('https?:\\/\\/imgur.com/a/', item['data'].get('url', '')):
