@@ -96,9 +96,6 @@ def create_jobs(item, library_folder, config, rs, jobs):
 		
 		do_commands.append(command)
 		
-		if domain == 'i.redd.it':
-			do_commands.append( ['echo', 'lmao'] )
-	
 	if len(do_commands) > 0:
 		jobs.extend( [metadata] + do_commands )
 	else:
