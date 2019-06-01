@@ -78,10 +78,9 @@ def getResource(username, domain, name):
 def getMultifileResource(username, domain, name, files, item):
 	if item['rsaved']['download']['class'] == 'video':
 		if len(files) >= 2 \
-		and any( [file.endswith('.description') for file in files] ) \
 		and any( ['video' in (mimetypes.guess_type(file)[0] or '') for file in files] ):
 			return template('video.html', data=[username, domain, name, files, item])
-	return str(files) + '\n\n' + json.dumps(item, indent=4)
+	return '<pre>' + str(files) + '\n\n' + json.dumps(item, indent=4) + '</pre>'
 
 @route('/u/<username>/res/<domain>/<name>/<fname>')
 def getResourceFromFolder(username, domain, name, fname):
