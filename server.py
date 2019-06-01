@@ -54,8 +54,7 @@ def getResource(username, domain, name):
 	if not os.path.exists(domain_folder):
 		return abort(404, 'Resource not found')
 	
-	# index = cached_indices[username]
-	index = rsaved.load_index(username)
+	index = cached_indices[username]
 	corresponding_item = next(i for i in index if i['data']['name'] == name)
 	
 	files = [f for f in os.listdir(domain_folder) if f.startswith(name)]
