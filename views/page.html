@@ -43,7 +43,7 @@ import time, html
 						<span class="nsfw">NSFW</span>
 						%end
 						<small>
-							<span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}}.
+							<span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}} to /r/{{data['subreddit']}}.
 							<a href="{{data['url']}}">permalink</a>
 						</small><br/>
 						
