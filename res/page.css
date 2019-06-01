@@ -25,7 +25,7 @@ small.domain {
 	font-style: italic;
 }
 
-p.comment {
+.md {
 	font-size: small;
 	border-left: 4px solid #55f;
 	background: #ddf;

@@ -1,5 +1,5 @@
 <%
-import time
+import time, html
 
 %>
 <!DOCTYPE html>
@@ -70,9 +70,7 @@ import time
 						<small class="domain">({{data.get('subreddit')}})</small><br/>
 						<small><span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}}</small><br/>
 						
-						<p class="comment">
-							{{data['body']}}
-						</p>
+						{{!html.unescape(data['body_html'])}}
 						
 					</div>
 				</div>
