@@ -130,7 +130,7 @@ def add_to_index(username, data):
 if __name__ == "__main__":
 	print(f'rsaved/{__version__} download_user.py')
 	if len(sys.argv) != 2:
-		print('Usage:', sys.argv[0], '[command] [username]')
+		print('Usage:', sys.argv[0], ' [username]')
 		sys.exit(1)
 
 	if not os.path.exists(f'user/{sys.argv[1]}'):

@@ -1,11 +1,11 @@
 rsaved
 ======
 
-A Python 3.6 utility for mirroring personal reddit.com/saved feeds, and the content on these feeds.
+A Python utility for mirroring personal reddit.com/saved feeds, and the content on these feeds. This project is in early development, and being modified in wild, major, inconsistent ways.
 
-This project is in early development, and being modified in wild, major, inconsistent ways.
+Requires `youtube-dl`, `requests`, `ffmpeg` and Python 3.6 or newer. bottle.py is required and packaged with this repo.
 
-Requires `youtube-dl`, `requests`, and Python 3.6 or newer. bottle.py is required and packaged with this repo.
+It is in this author's interest to avoid forcing a non-trivial amount of effort on the user to run this program, to the point of foregoing the use of official APIs, or anything that requires a specially generated API key. If you are able to access it in your web browser: You should be able to access it locally without any extra effort.
 
 ## How to use
 
