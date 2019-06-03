@@ -1,3 +1,8 @@
 {
-	"User-Agent": "rsaved/1.0"
+	"User-Agent": "rsaved/1.0",
+	"proxy": "",
+	
+	"youtube-dl": {
+		"format": "bestvideo[height=720][filesize<512MB]+bestaudio/bestvideo[filesize<512MB]+bestaudio/best[filesize<512MB]/worst"
+	}
 }

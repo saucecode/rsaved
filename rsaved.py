@@ -195,7 +195,7 @@ def execute_job(username, name, force=False):
 		metadata['jobs_completed'] = int(time.time())
 		merge_job_metadata(username, name, metadata)
 	
-	dump_library_entry_manifest(username, name, manifest)
+	dump_library_entry_manifest(username, name, manifest, indent=4)
 	
 	return returncodes
 

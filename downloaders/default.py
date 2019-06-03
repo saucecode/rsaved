@@ -77,8 +77,8 @@ def create_jobs(item, library_folder, config, rs, jobs):
 		if 'proxy' in config:
 			command.extend( ['--proxy', config['proxy']] )
 		
-		if 'youtu' in domain or 'twitch' in domain:
-			command.extend( ['--format', '720p[filesize<512MB]/720p60[filesize<512MB]/1080p[filesize<128MB]/1080p60[filesize<64MB]/best[filesize<512MB]/worst'] )
+		if ('youtu' in domain or 'twitch' in domain) and 'youtube-dl' in config:
+			command.extend( ['--format', config['youtube-dl'].get('format', '')] )
 			
 		do_commands.append(command)
 	
