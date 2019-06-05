@@ -103,16 +103,11 @@ def regenerate_jobs(username, force=False):
 		if post['rsaved'].get('ignore') and not force:
 			continue
 		
-		# *fuck this shit i'm out
-		# jobs = [downloader.create_jobs(post, f'user/{username}/library', config, rs) for downloader in downloaders if post['data']['domain'] in downloader.domains() or len(downloader.domains()) == 0]
-		
 		jobs = []
 		for downloader in downloaders:
 			if post['data'].get('domain', '') in downloader.domains() or len(downloader.domains()) == 0:
 				downloader.create_jobs(post, f'user/{username}/library', config, rs, jobs)
 			
-		# jobs = [job for sublist in jobs for job in sublist]
-		jobs = [j for j in jobs if j is not None]
 		all_jobs.extend( jobs ) # create_jobs can return None - filter them out here
 		
 		# despite having downloaders with domains available, they produced no jobs.
@@ -200,6 +195,8 @@ def execute_job(username, name, force=False):
 	return returncodes
 
 def merge_job_metadata(username, name, metadata):
+	'''Adds metadata from a job file into the item's index entry.'''
+	
 	manifest = load_library_entry_manifest(username, name)
 	index = load_index(username)
 	
