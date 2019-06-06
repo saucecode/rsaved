@@ -13,63 +13,77 @@ def create_jobs(item, library_folder, config, rs, jobs):
 	if len(jobs) > 0:
 		return
 	name = item["data"]["name"]
+	domain = item['data'].get('domain')
 	
-	if not re.match('https?:\\/\\/imgur.com/a/', item['data'].get('url', '')):
-		return
-	
-	domain = item['data']['domain']
+	if not domain: return
 	
 	do_commands = []
 	
-	# this object gets attached after
-	metadata = {'downloader_version': 'imgur_album/1.0', 'jobs_generated': int(time.time())}
-	
-	# check for a thumbnail from reddit
-	thumbnail = item['data']['thumbnail']
-	if thumbnail and type(thumbnail) == str and thumbnail.startswith('http'):
-		ext = thumbnail.split('?')[0].split('.')[-1]
-		fname = f'{name}.thumb_small.{ext}'
-		metadata['thumb'] = fname
+	if re.match('https?:\\/\\/imgur.com/a/', item['data'].get('url', '')):
+		# this object gets attached after
+		metadata = {'downloader_version': 'imgur_album/1.0', 'jobs_generated': int(time.time())}
+		
+		# check for a thumbnail from reddit
+		thumbnail = item['data']['thumbnail']
+		if thumbnail and type(thumbnail) == str and thumbnail.startswith('http'):
+			ext = thumbnail.split('?')[0].split('.')[-1]
+			fname = f'{name}.thumb_small.{ext}'
+			metadata['thumb'] = fname
+			
+			command = [
+				'python3', 'rqget.py',
+				'-O', f'{library_folder}/{domain}/thumbs/{fname}',
+				thumbnail
+			]
+			
+			if config.get('proxy'):
+				command += ['--proxy', config.get('proxy')]
+			
+			do_commands.append(command)
+
+		albumid = item["data"]["url"].split("/")[-1]
+		metadata['class'] = 'image_album'
+		metadata['albumid'] = albumid
+		
+		ajaxalbums = f'https://imgur.com/ajaxalbums/getimages/{albumid}/hit.json'
+		
+		mkdir_command = [
+			'mkdir', '-p', f'{library_folder}/{domain}/{name}.{albumid}'
+		]
+		
+		download_command = [
+			'python3', 'rqget.py',
+			'-O', f'{library_folder}/{domain}/{name}.{albumid}/hit.json',
+			ajaxalbums
+		]
+		
+		imgur_command = [
+			'python3', 'downloaders/imgur_album.py',
+			f'{library_folder}/{domain}/{name}.{albumid}/hit.json'
+		]
+
+		if config.get('proxy'):
+			download_command += ['--proxy', config.get('proxy')]
+			imgur_command += ['--proxy', config.get('proxy')]
+
+		do_commands.append(mkdir_command)
+		do_commands.append(download_command)
+		do_commands.append(imgur_command)
+		
+	elif re.match('https?:\\/\\/imgur.com\\/[a-zA-Z0-9]{4,}$', item['data'].get('url', '')): # stock short imgur URL
+		# this object gets attached after
+		metadata = {'downloader_version': 'imgur_album/1.0', 'jobs_generated': int(time.time()), 'class': 'image'}
 		
 		command = [
-			'python3', 'rqget.py',
-			'-O', f'{library_folder}/{domain}/thumbs/{fname}',
-			thumbnail
+			'python3', 'imgur_stock.py', '-d', f'{library_folder}/{domain}/{name}', item['data']['url']
 		]
 		
 		if config.get('proxy'):
 			command += ['--proxy', config.get('proxy')]
+		if config.get('User-Agent'):
+			command += ['--user-agent', config.get('User-Agent')]
 		
 		do_commands.append(command)
-
-	albumid = item["data"]["url"].split("/")[-1]
-	metadata['class'] = 'image_album'
-	metadata['albumid'] = albumid
-	
-	ajaxalbums = f'https://imgur.com/ajaxalbums/getimages/{albumid}/hit.json'
-	
-	mkdir_command = [
-		'mkdir', '-p', f'{library_folder}/{domain}/{name}.{albumid}'
-	]
-	
-	download_command = [
-		'python3', 'rqget.py',
-		'-O', f'{library_folder}/{domain}/{name}.{albumid}/hit.json',
-		ajaxalbums
-	]
-	
-	imgur_command = [
-		'python3', 'downloaders/imgur_album.py',
-		f'{library_folder}/{domain}/{name}.{albumid}/hit.json'
-	]
-
-	if config.get('proxy'):
-		download_command += ['--proxy', config.get('proxy')]
-		imgur_command += ['--proxy', config.get('proxy')]
-
-	do_commands.append(mkdir_command)
-	do_commands.append(download_command)
-	do_commands.append(imgur_command)
 	
 	if len(do_commands) > 0:
 		jobs.extend( [metadata] + do_commands )
