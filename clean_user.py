@@ -37,7 +37,7 @@ if __name__ == "__main__":
 			return json.load(f) if json_load else f.read()
 	
 	json_files = [loadFile(f'{library_folder}/{file}', True) for file in os.listdir(library_folder) if file.endswith('json')]
-	errored_jobs = [file for file in json_files if any(code != 0 for code in file['returncodes'])]
+	errored_jobs = [file for file in json_files if any(code != 0 for code in file.get('returncodes', [0]))]
 	
 	print('Found', len(errored_jobs), 'jobs which exited with error codes.')
 	print('I will now enumerate through them.')
