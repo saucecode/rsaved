@@ -49,6 +49,11 @@ if __name__ == "__main__":
 			
 			print('DL', job['name'], corresponding_item['data']['title'], corresponding_item['data']['url'])
 			rsaved.execute_job(username, job['name'])
+			
+			print('Downloading reddit comments thread...')
+			rsaved.retrieve_comments(username, job['name'], index=index)
+			print('Done\n')
+			
 	except KeyboardInterrupt:
 		print('Emergency stop! Saving index file...')
 		

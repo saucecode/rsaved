@@ -37,6 +37,7 @@ if __name__ == "__main__":
 	os.mkdir(f'user/{username}/cache/history')
 	os.mkdir(f'user/{username}/cache/download_user')
 	os.mkdir(f'user/{username}/library')
+	os.mkdir(f'user/{username}/reddit')
 
 	print('Copying config files...')
 	with open('config_default.json','r') as f: config_default = json.load(f)

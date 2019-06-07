@@ -194,6 +194,55 @@ def execute_job(username, name, force=False):
 	
 	return returncodes
 
+def retrieve_comments(username, name, *, index=None, item=None, force=False):
+	'''Download and save a reddit post's body and surface level comments.
+	
+	No request is made if a {name}.json file appears in the user/{username}/reddit folder (unless forced).
+	
+	Sends one or more requests to retrieve the comments in a reddit post.
+	This may recursively traverse the thread for all comments depending on user configuration.
+	
+	Optional arguments are used to reduce repeated reading/processing of index files.
+	
+	TODO: Use reddit-thread-ripper to download the entire thread.
+	
+	Args:
+		username: User in question.
+		name: Reddit post name (e.g t3_87vbae).
+		index: The user's index if already loaded. Optional.
+		item: The index item corresponding to the name if already loaded. Optional.
+		force: Download and save the post data even if it appears to exist in the reddit folder.
+	
+	Returns:
+		True on successful download and write.
+		
+	Raises:
+		HTTPError from `requests` if request failed.
+	'''
+	if not index:
+		index = load_index(username)
+	
+	if not item:
+		item = next(i for i in index if i['data']['name'] == name)
+	
+	config, rs = load_user_configs(username)
+	
+	reddit_folder = f'user/{username}/reddit'
+	target_file = f'{reddit_folder}/{name}.json.gz'
+	
+	if not os.path.exists(target_file) or force:	
+		response = get_request(f'https://reddit.com{item["data"]["permalink"]}.json', config, rs)
+		response.raise_for_status()
+		data = response.content
+	
+		with gzip.open(target_file, 'w') as f:
+			f.write(data)
+			
+		return True
+	
+	return False
+	
+
 def merge_job_metadata(username, name, metadata):
 	'''Adds metadata from a job file into the item's index entry.'''
 	
