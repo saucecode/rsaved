@@ -230,8 +230,13 @@ def retrieve_comments(username, name, *, index=None, item=None, force=False):
 	reddit_folder = f'user/{username}/reddit'
 	target_file = f'{reddit_folder}/{name}.json.gz'
 	
-	if not os.path.exists(target_file) or force:	
-		response = get_request(f'https://reddit.com{item["data"]["permalink"]}.json', config, rs)
+	if not os.path.exists(target_file) or force:
+		session = requests.Session()
+		session.cookies.update({
+			'_options': '{%22pref_quarantine_optin%22:true}'
+		})
+		
+		response = get_request(f'https://reddit.com{item["data"]["permalink"]}.json', config, rs, session)
 		response.raise_for_status()
 		data = response.content
 	
