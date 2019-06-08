@@ -21,17 +21,58 @@ import time, html
 					div.setAttribute("style", "display:none;");
 				}
 			}
+			
+			function toggleSearch(cb) {
+				var element = document.getElementById("search");
+				if(!cb.checked)
+					element.setAttribute("style", "display: none;");
+				else
+					element.setAttribute("style", "display: block;");
+			}
+			
+			function onload() {
+				subreddits = [];
+				var children = document.getElementById("select_subreddit").children;
+				for(var i=0; i<children.length; i+=1) {
+					subreddits.push(children[i].getAttribute("value"));
+				}
+			}
+			
+			function onSubredditsChange(textbox) {
+				var filtered = [];
+				var children = document.getElementById("select_subreddit").children;
+				for(var i=0; i<subreddits.length; i+=1){
+					if(!subreddits[i].toLowerCase().includes(textbox.value.toLowerCase()))
+						children[i].style.display = "none";
+					else
+						children[i].style.display = "list-item";
+				}
+			}
 		</script>
 	</head>
-	<body>
-			%for idx, item in enumerate(index_segment):
-			%data = item['data']
-				%if item['kind'] == 't3':
-				%title = data['title']
-				%domain = data['domain']
-				%name = data['name']
-				%score = data['score']
-				
+	<body onload="onload();">
+		Show Search Options <input type="checkbox" onclick="toggleSearch(this);" autocomplete="off" />
+		<div id="search" style="display: block;">
+			<div class="subreddits">
+				<input type="text" id="subreddit_filter" oninput="onSubredditsChange(this);" autocomplete="off"/><br/>
+				<select id="select_subreddit" multiple="multiple">
+					%for subreddit in subreddits:
+						<option value="{{subreddit}}">{{subreddit}}</option>
+					%end
+				</select>
+			</div>
+		</div>
+		<hr/>
+		
+			<%
+			for idx, item in enumerate(index_segment):
+				data = item['data']
+				if item['kind'] == 't3':
+					title = data['title']
+					domain = data['domain']
+					name = data['name']
+					score = data['score']
+			%>
 				<div class="entry">
 					<div class="left">{{idx+1+after_index}}</div>
 					<div class="left"><span class="score">{{score}}</span></div>
@@ -78,6 +119,8 @@ import time, html
 				
 			%end
 			
-			<a href="/u/{{username}}/?after={{index_segment[-1]['data']['name']}}&limit={{limit}}">Next Page</a>
+			<a href="/u/{{username}}/?after={{index_segment[-1]['data']['name']}}&limit={{limit}}&sr={{query.sr}}&nsfw={{query.nsfw}}&sort={{query.sort}}&reverse={{query.reverse}}">Next Page</a>
+			<hr/>
+			<p>This page was generated on {{time.ctime()}}.</p>
 	</body>
 </html>

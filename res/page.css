@@ -62,3 +62,7 @@ input[type="checkbox"] {
 input[type="checkbox"]:checked ~ .preview {
 	display: block;
 }
+
+div#search .subreddits select {
+	height: 220px;
+}

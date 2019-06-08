@@ -14,7 +14,7 @@ def userPage(username=None):
 		return abort(404, 'No such user')
 	
 	after = request.query.after or None
-	limit = int(request.query.limit or 15)
+	limit = int(request.query.limit or 50)
 	
 	index = rsaved.load_index(username)
 	cached_indices[username] = index
@@ -25,14 +25,30 @@ def userPage(username=None):
 		subreddits = request.query.sr.split(',')
 		filtered_index = [item for item in filtered_index if item['data'].get('subreddit') in subreddits]
 	
+	if request.query.nsfw:
+		if request.query.nsfw == 'only':
+			filtered_index = [item for item in filtered_index if item['data']['over_18']]
+		elif request.query.nsfw == 'no':
+			filtered_index = [item for item in filtered_index if not item['data']['over_18']]
+	
+	if request.query.sort:
+		if request.query.sort == 'newest':
+			filtered_index.sort(key=lambda item: item['data']['created'])
+			filtered_index.reverse()
+		elif request.query.sort == 'oldest':
+			filtered_index.sort(key=lambda item: item['data']['created'])
+		elif request.query.sort == 'score':
+			filtered_index.sort(key=lambda item: item['data']['score'])
+			filtered_index.reverse()
+	
+	if request.query.reverse:
+		filtered_index.reverse()
+	
 	names_only = [item['data']['name'] for item in filtered_index]
 	try:
 		after_index = names_only.index(after) + 1
 	except ValueError:
 		after_index = 0
-	
-	if after_index+limit > len(filtered_index):
-		return 'Nothing to show.'
 	
 	return template('page.html',
 		limit=limit,
@@ -40,7 +56,8 @@ def userPage(username=None):
 		index_segment=filtered_index[after_index:after_index+limit],
 		username=username,
 		getLibraryResourceMimetype=getLibraryResourceMimetype,
-		query=request.query
+		query=request.query,
+		subreddits=sorted(set([item['data']['subreddit'] for item in filtered_index]))
 	)
 
 @route('/u/<username>/res/<domain>/thumbs/<name>')
