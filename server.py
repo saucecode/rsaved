@@ -14,23 +14,33 @@ def userPage(username=None):
 		return abort(404, 'No such user')
 	
 	after = request.query.after or None
-	limit = int(request.query.limit or 100)
+	limit = int(request.query.limit or 15)
 	
 	index = rsaved.load_index(username)
 	cached_indices[username] = index
 	
-	names_only = [item['data']['name'] for item in index]
+	filtered_index = index
+	
+	if request.query.sr:
+		subreddits = request.query.sr.split(',')
+		filtered_index = [item for item in filtered_index if item['data'].get('subreddit') in subreddits]
+	
+	names_only = [item['data']['name'] for item in filtered_index]
 	try:
 		after_index = names_only.index(after) + 1
 	except ValueError:
 		after_index = 0
 	
+	if after_index+limit > len(filtered_index):
+		return 'Nothing to show.'
+	
 	return template('page.html',
 		limit=limit,
 		after_index=after_index,
-		index_segment=index[after_index:after_index+limit],
+		index_segment=filtered_index[after_index:after_index+limit],
 		username=username,
-		getLibraryResourceMimetype=getLibraryResourceMimetype
+		getLibraryResourceMimetype=getLibraryResourceMimetype,
+		query=request.query
 	)
 
 @route('/u/<username>/res/<domain>/thumbs/<name>')
