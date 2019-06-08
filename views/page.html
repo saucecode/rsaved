@@ -67,55 +67,9 @@ import time, html
 			<%
 			for idx, item in enumerate(index_segment):
 				data = item['data']
-				if item['kind'] == 't3':
-					title = data['title']
-					domain = data['domain']
-					name = data['name']
-					score = data['score']
 			%>
-				<div class="entry">
-					<div class="left">{{idx+1+after_index}}</div>
-					<div class="left"><span class="score">{{score}}</span></div>
-					<div class="{{'left nsfw' if data.get('over_18',False) else 'left'}}"><img src="/u/{{username}}/res/{{domain}}/thumbs/{{name}}" /></div>
-					<div class="right">
-						<a href="/u/{{username}}/res/{{domain}}/{{name}}">{{title}}</a>
-						<small class="domain">({{domain}})</small><br/>
-						%if data.get('over_18', False):
-						<span class="nsfw">NSFW</span>
-						%end
-						<small>
-							<span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}} to /r/{{data['subreddit']}}.
-							<a href="/u/{{username}}/comments/{{data['name']}}">comments</a> | <a href="{{data['url']}}">permalink</a>
-						</small><br/>
-						
-						<input type="checkbox" onclick="togglePreview(this);" autocomplete="off" />
-						<div class="preview">
-							%if item['rsaved'].get('download', {}).get('class') == 'video':
-							<video controls="controls" preload="none">
-								<source src="/u/{{username}}/res/{{domain}}/{{name}}" type="{{getLibraryResourceMimetype(username, domain, name)}}" />
-							</video>
-							%else:
-							<img data-src="/u/{{username}}/res/{{domain}}/{{name}}" />
-							%end
-						</div>
-					</div>
-				</div>
 				
-				%elif item['kind'] == 't1':
-				<div class="entry">
-					<div class="left">{{idx+1+after_index}}</div>
-					<div class="left">{{data['score']}}</div>
-					<div class="right">
-						<small>Comment on</small>
-						<a href="/u/{{username}}/res/{{data.get('subreddit')}}/{{data['name']}}">{{data.get('link_title')}}</a>
-						<small class="domain">({{data.get('subreddit')}})</small><br/>
-						<small><span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}}</small><br/>
-						
-						{{!html.unescape(data['body_html'])}}
-						
-					</div>
-				</div>
-				%end
+				%include('entry.tpl.html')
 				
 			%end
 			
