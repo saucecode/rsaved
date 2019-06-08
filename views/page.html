@@ -85,7 +85,7 @@ import time, html
 						%end
 						<small>
 							<span class="author">{{data['author']}}</span> posted at {{time.ctime(data['created'])}} to /r/{{data['subreddit']}}.
-							<a href="{{data['url']}}">permalink</a>
+							<a href="/u/{{username}}/comments/{{data['name']}}">comments</a> | <a href="{{data['url']}}">permalink</a>
 						</small><br/>
 						
 						<input type="checkbox" onclick="togglePreview(this);" autocomplete="off" />

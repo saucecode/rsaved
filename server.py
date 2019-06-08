@@ -1,6 +1,6 @@
-import os, rsaved, time, mimetypes, json
+import os, rsaved, time, mimetypes, json, gzip
 
-from bottle import route, run, template, abort, static_file, request
+from bottle import route, run, template, abort, static_file, request, response
 
 cached_indices = {}
 
@@ -59,6 +59,16 @@ def userPage(username=None):
 		query=request.query,
 		subreddits=sorted(set([item['data']['subreddit'] for item in filtered_index]))
 	)
+
+@route('/u/<username>/comments/<name>')
+def getCommentsTree(username, name):
+	target_file = f'user/{username}/reddit/{name}.json.gz'
+	if not os.path.exists(target_file):
+		return abort(404, 'Resource not found')
+	
+	with gzip.open(target_file, 'r') as f:
+		response.content_type = 'application/json'
+		return f.read()
 
 @route('/u/<username>/res/<domain>/thumbs/<name>')
 def getResourceThumb(username, domain, name):
