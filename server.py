@@ -22,8 +22,8 @@ def userPage(username=None):
 	filtered_index = index
 	
 	if request.query.sr:
-		subreddits = request.query.sr.split(',')
-		filtered_index = [item for item in filtered_index if item['data'].get('subreddit') in subreddits]
+		subreddits = [i.lower() for i in request.query.sr.split(',')]
+		filtered_index = [item for item in filtered_index if item['data'].get('subreddit', '').lower() in subreddits]
 	
 	if request.query.nsfw:
 		if request.query.nsfw == 'only':
