@@ -75,7 +75,7 @@ def create_jobs(item, library_folder, config, rs, jobs):
 		metadata = {'downloader_version': 'imgur_album/1.0', 'jobs_generated': int(time.time()), 'class': 'image'}
 		
 		command = [
-			'python3', 'imgur_stock.py', '-d', f'{library_folder}/{domain}/{name}', item['data']['url']
+			'python3', 'imgur_stock.py', '-d', f'{library_folder}/{domain}/{name}.', item['data']['url']
 		]
 		
 		if config.get('proxy'):
