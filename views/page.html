@@ -32,10 +32,16 @@ import time, html
 			
 			function onload() {
 				subreddits = [];
+				selectedSubreddits = [];
+				
 				var children = document.getElementById("select_subreddit").children;
 				for(var i=0; i<children.length; i+=1) {
 					subreddits.push(children[i].getAttribute("value"));
 				}
+				
+				var url = new URL(window.location);
+				
+				
 			}
 			
 			function onSubredditsChange(textbox) {
@@ -48,6 +54,32 @@ import time, html
 						children[i].style.display = "list-item";
 				}
 			}
+			
+			function onSubredditsSelect(select) {
+				var index = select.selectedIndex;
+				var children = select.children;
+				if(selectedSubreddits.indexOf(children[index].getAttribute("value")) > -1) { // contains
+					// remove from selectedSubreddits
+					selectedSubreddits.splice(selectedSubreddits.indexOf(children[index].getAttribute("value")), 1);
+					
+				}else { // does not contain
+					selectedSubreddits.push(children[index].getAttribute("value"));
+				}
+				
+				document.getElementById("selected_subreddits").innerHTML = selectedSubreddits.join(', ');
+			}
+			
+			function doSearch() {
+				var params = [];
+				
+				if(selectedSubreddits.length > 0) {
+					params.push("sr=" + selectedSubreddits.join(','));
+				}
+				
+				var url = new URL(window.location);
+				
+				window.location = url.origin + url.pathname + '?' + params.join('&');
+			}
 		</script>
 	</head>
 	<body onload="onload();">
@@ -55,12 +87,15 @@ import time, html
 		<div id="search" style="display: block;">
 			<div class="subreddits">
 				<input type="text" id="subreddit_filter" oninput="onSubredditsChange(this);" autocomplete="off"/><br/>
-				<select id="select_subreddit" multiple="multiple">
-					%for subreddit in subreddits:
+				<select id="select_subreddit" multiple="multiple" ondblclick="onSubredditsSelect(this);">
+					%for subreddit in sorted(subreddits, key=lambda sr:sr.lower()):
 						<option value="{{subreddit}}">{{subreddit}}</option>
 					%end
 				</select>
+				<p id="selected_subreddits"></p>
 			</div>
+			
+			<!--<input type="button" onclick="doSearch();" value="Search" />-->
 		</div>
 		<hr/>
 		
@@ -73,7 +108,10 @@ import time, html
 				
 			%end
 			
-			<a href="/u/{{username}}/?after={{index_segment[-1]['data']['name']}}&limit={{limit}}&sr={{query.sr}}&nsfw={{query.nsfw}}&sort={{query.sort}}&reverse={{query.reverse}}">Next Page</a>
+			<!--
+				<a href="/u/{{username}}/?after={{index_segment[-1]['data']['name']}}&limit={{limit}}&sr={{query.sr}}&nsfw={{query.nsfw}}&sort={{query.sort}}&reverse={{query.reverse}}">Next Page</a>
+			-->
+			<a href="/u/{{username}}/?after={{index_segment[-1]['data']['name']}}&limit={{limit}}{{'&sr=' + query.sr if query.sr else ''}}{{'&nsfw=' + query.nsfw if query.nsfw else ''}}{{'&sort=' + query.sort if query.sort else ''}}{{'&reverse=' + query.reverse if query.reverse else ''}}">Next Page</a>
 			<hr/>
 			<p>This page was generated on {{time.ctime()}}.</p>
 	</body>
