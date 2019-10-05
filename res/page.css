@@ -32,6 +32,10 @@ small.domain {
 	padding-left: 4px;
 }
 
+.md p {
+	margin-top: 0px;
+}
+
 div.nsfw {
 	background: url('/res/nsfw.png');
 	background-size: contain;
@@ -65,4 +69,8 @@ input[type="checkbox"]:checked ~ .preview {
 
 div#search .subreddits select {
 	height: 220px;
+}
+
+span.commenthead {
+	font-size: small;
 }

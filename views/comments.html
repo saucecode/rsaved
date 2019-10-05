@@ -1,0 +1,33 @@
+<%
+import time, html
+postdata = thread_data[0]['data']['children'][0]['data']
+%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Comments</title>
+		<link rel="stylesheet" href="/res/page.css" type="text/css" />
+	</head>
+	<body>
+		<div class="mainpost">
+			<h1>{{postdata['title']}}</h1>
+		</div>
+		<hr/>
+		<div class="comments">
+			%for post in thread_data[1]['data']['children']:
+				%if post['kind'] != 't1':
+					%continue
+				%end
+				<div class="comment">
+					<span class="commenthead">
+						<a href="#">{{ post['data']['author'] }}</a> | <strong>{{ post['data']['score'] }} points</strong> | {{ time.ctime(post['data']['created_utc']) }}
+					</span>
+					<br/>
+					{{! html.unescape(post['data']['body_html']) }}
+				</div>
+			%end
+		</div>
+			
+		<p>This page was generated on {{time.ctime()}}.</p>
+	</body>
+</html>

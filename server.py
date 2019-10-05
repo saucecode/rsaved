@@ -57,7 +57,7 @@ def userPage(username=None):
 		username=username,
 		getLibraryResourceMimetype=getLibraryResourceMimetype,
 		query=request.query,
-		subreddits=sorted(set([item['data']['subreddit'] for item in filtered_index]))
+		subreddits=sorted(set([item['data']['subreddit'] for item in index]))
 	)
 
 @route('/u/<username>/comments/<name>')
@@ -67,8 +67,12 @@ def getCommentsTree(username, name):
 		return abort(404, 'Resource not found')
 	
 	with gzip.open(target_file, 'r') as f:
-		response.content_type = 'application/json'
-		return f.read()
+		thread_data = json.load(f)
+	
+	return template('comments.html',
+		name=name,
+		thread_data=thread_data
+	)
 
 @route('/u/<username>/res/<domain>/thumbs/<name>')
 def getResourceThumb(username, domain, name):
