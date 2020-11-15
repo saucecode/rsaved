@@ -8,7 +8,8 @@ VIDEO_DOMAINS = [
 		'gfycat.com',
 		'm.youtube.com',
 		'clips.twitch.tv',
-		'vimeo.com'
+		'vimeo.com',
+		'redgifs.com'
 	]
 
 IMAGE_DOMAINS = [
