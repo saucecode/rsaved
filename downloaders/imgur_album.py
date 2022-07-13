@@ -7,7 +7,7 @@ import mimetypes, time, re
 __version__ = '0.1'
 
 def domains():
-	return 'imgur.com'
+	return ['imgur.com', 'reddit.com']
 
 def create_jobs(item, library_folder, config, rs, jobs):
 	if len(jobs) > 0:
@@ -84,6 +84,50 @@ def create_jobs(item, library_folder, config, rs, jobs):
 			command += ['--user-agent', config.get('User-Agent')]
 		
 		do_commands.append(command)
+	
+	elif re.match('^https?:\\/\\/(www\\.)?reddit.com\\/', item['data'].get('url', '')):
+		if item['data'].get('gallery_data') and len(item['data']['gallery_data']['items']) > 0:
+			metadata = {'downloader_version': 'imgur_album/1.0', 'jobs_generated': int(time.time())}
+			
+			metadata['class'] = 'image_album'
+			metadata['albumid'] = 'reddit'
+		
+			# check for a thumbnail from reddit
+			thumbnail = item['data']['thumbnail']
+			if thumbnail and type(thumbnail) == str and thumbnail.startswith('http'):
+				ext = thumbnail.split('?')[0].split('.')[-1]
+				fname = f'{name}.thumb_small.{ext}'
+				metadata['thumb'] = fname
+				
+				command = [
+					'python3', 'rqget.py',
+					'-O', f'{library_folder}/{domain}/thumbs/{fname}',
+					thumbnail
+				]
+				
+				if config.get('proxy'):
+					command += ['--proxy', config.get('proxy')]
+				
+				do_commands.append(command)
+			
+			mkdir_command = [
+				'mkdir', '-p', f'{library_folder}/{domain}/album_{name}'
+			]
+			
+			# downloading album data
+			media_metadata = item['data']['media_metadata']
+			download_commands = []
+			
+			for index, (key, val) in enumerate(media_metadata.items()):
+				extension = mimetypes.guess_extension(val['m'], strict=False)
+				media_fname = key + extension
+				download_commands.append(
+					['python3', 'rqget.py', '-O', f'{library_folder}/{domain}/album_{name}/{media_fname}',
+					f'https://i.redd.it/{media_fname}']
+				)
+			
+			do_commands.append(mkdir_command)
+			do_commands.extend(download_commands)
 	
 	if len(do_commands) > 0:
 		jobs.extend( [metadata] + do_commands )
