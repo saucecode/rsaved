@@ -65,7 +65,7 @@ def create_jobs(item, library_folder, config, rs, jobs):
 			return []
 		
 		command = [
-			'youtube-dl',
+			'yt-dlp',
 			'--write-thumbnail',
 			'--write-description',
 			'--limit-rate', '2M', # 2 MB/s
